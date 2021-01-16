@@ -72,9 +72,11 @@ public class TransactionService {
                     wait = true;
 
                     for (Transaction tAlreadyHasLock : transactionsThatAlreadyHaveLock) {
-                        for (WaitForGraph waitForGraph : waitForGraphs) {
-                            if (waitForGraph.getTransactionHasLock().equals(tAlreadyHasLock)) {
-                                waitForGraph.setTransactionWaitsLock(transaction);
+                        synchronized (waitForGraphs) {
+                            for (WaitForGraph waitForGraph : waitForGraphs) {
+                                if (waitForGraph.getTransactionHasLock().equals(tAlreadyHasLock)) {
+                                    waitForGraph.setTransactionWaitsLock(transaction);
+                                }
                             }
                         }
                     }
@@ -83,7 +85,9 @@ public class TransactionService {
                 if (wait) {
                     LOG.info("Transaction t[" + transaction.getId() + "] is waiting...");
                     Thread.sleep(1000);
-                    shouldAbort.set(deadlockChecker.checkForDeadlock(transaction, waitForGraphs));
+                    synchronized (waitForGraphs) {
+                        shouldAbort.set(deadlockChecker.checkForDeadlock(transaction, waitForGraphs));
+                    }
                     LOG.info("Deadlock checker shouldAbort = " + shouldAbort);
                 }
             }
@@ -95,7 +99,9 @@ public class TransactionService {
 
             // else add the lock to locks and execute operation
             // add instance in locks
-            locks.add(lock);
+            synchronized (locks) {
+                locks.add(lock);
+            }
             operation.setLock(lock);
 
             // execute operation
@@ -117,7 +123,9 @@ public class TransactionService {
                         // rollback (execute complementary operation + delete locks)
                         LOG.info("Rollback executed for: " + operation.getOperationType() + ", on resource" + operation.getRecordID() + ", from table " + operation.getTable());
                         operation.rollback();
-                        locks.remove(operation.getLock());
+                        synchronized (locks) {
+                            locks.remove(operation.getLock());
+                        }
                     }
                 }
 
@@ -192,11 +200,12 @@ public class TransactionService {
     private List<Transaction> getTransactionsThatAlreadyHave(Lock lockToAcquire) {
         List<Transaction> transactionsThatHaveLock = new ArrayList<>();
 
-        for (Lock lock : locks) {
-            if (lockTypesInConflict(lock, lockToAcquire)) {
-                transactionsThatHaveLock.add(lock.getTransaction());
+        synchronized (locks) {
+            for (Lock lock : locks) {
+                if (lockTypesInConflict(lock, lockToAcquire)) {
+                    transactionsThatHaveLock.add(lock.getTransaction());
+                }
             }
-
         }
 
         return transactionsThatHaveLock;
