@@ -1,8 +1,6 @@
 package com.server.dto.mapper;
 
-import com.server.dto.business.DirectorDTO;
 import com.server.dto.business.MovieDTO;
-import com.server.model.db1.Director;
 import com.server.model.db1.Movie;
 
 import java.util.ArrayList;
@@ -14,7 +12,7 @@ public class MovieMapper {
 
         movie.setId(movieDTO.getId());
         movie.setTitle(movieDTO.getTitle());
-        movie.setDirectors(DirectorMapper.directorsDTOToDirectors((List<DirectorDTO>) movieDTO.getDirectors()));
+        movie.setDirector(DirectorMapper.directorDTOTODirector(movieDTO.getDirector()));
 
         return movie;
     }
@@ -24,7 +22,7 @@ public class MovieMapper {
 
         movieDTO.setId(movie.getId());
         movieDTO.setTitle(movie.getTitle());
-        movieDTO.setDirectors(DirectorMapper.directorsToDirectorsDTO((List<Director>) movie.getDirectors()));
+        movieDTO.setDirector(DirectorMapper.directorToDirectorDTO(movie.getDirector()));
 
         return movieDTO;
     }

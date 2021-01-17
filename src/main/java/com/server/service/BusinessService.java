@@ -42,34 +42,6 @@ public class BusinessService {
         this.transactionService = new TransactionService();
     }
 
-    public void addMovieForDirector(String directorId, Movie movie) {
-        List<Operation> operations = new ArrayList<>();
-
-        Operation<Director> operation1 = new Operation<>();
-        operation1.setTable("directors");
-        operation1.setRecordID(directorId);
-        operation1.setLockType(LockType.READ);
-        operation1.setOperationType(OperationType.SELECT_ONE);
-        operation1.setRepository(directorRepository);
-
-        operations.add(operation1);
-
-        Operation<Movie> operation2 = new Operation<>();
-        operation2.setTable("movies");
-        operation2.setRecordID(movie.getId());
-        operation2.setLockType(LockType.WRITE);
-        operation2.setOperationType(OperationType.INSERT);
-        operation2.setComplementaryOperationType(OperationType.DELETE);
-        operation2.setRepository(movieRepository);
-        DBResult<Movie> dbResult = new DBResult<>();
-        dbResult.setObject(movie);
-        operation2.setDbResult(dbResult);
-
-        operations.add(operation2);
-
-        generateAndExecuteTransaction(operations);
-    }
-
     public void addMovieAndDirector(Movie movie, Director director) {
         List<Operation> operations = new ArrayList<>();
 
@@ -145,6 +117,8 @@ public class BusinessService {
         operation1.setOperationType(OperationType.DELETE);
         operation1.setComplementaryOperationType(OperationType.INSERT);
         operation1.setRepository(movieRepository);
+        DBResult<Movie> dbResult1 = new DBResult<>();
+        operation1.setDbResult(dbResult1);
 
         operations.add(operation1);
 
@@ -155,6 +129,8 @@ public class BusinessService {
         operation2.setOperationType(OperationType.DELETE);
         operation2.setComplementaryOperationType(OperationType.INSERT);
         operation2.setRepository(directorRepository);
+        DBResult<Director> dbResult2 = new DBResult<>();
+        operation2.setDbResult(dbResult2);
 
         operations.add(operation2);
 
@@ -171,6 +147,8 @@ public class BusinessService {
         operation1.setOperationType(OperationType.DELETE);
         operation1.setComplementaryOperationType(OperationType.INSERT);
         operation1.setRepository(reviewRepository);
+        DBResult<Review> dbResult1 = new DBResult<>();
+        operation1.setDbResult(dbResult1);
 
         operations.add(operation1);
 
@@ -181,6 +159,8 @@ public class BusinessService {
         operation2.setOperationType(OperationType.DELETE);
         operation2.setComplementaryOperationType(OperationType.INSERT);
         operation2.setRepository(userRepository);
+        DBResult<User> dbResult2 = new DBResult<>();
+        operation2.setDbResult(dbResult2);
 
         operations.add(operation2);
 

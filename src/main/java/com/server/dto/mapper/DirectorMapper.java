@@ -36,14 +36,4 @@ public class DirectorMapper {
 
         return directorsDTO;
     }
-
-    public static List<Director> directorsDTOToDirectors(List<DirectorDTO> directorsDTO) {
-        List<Director> directors = new ArrayList<>();
-        for (DirectorDTO directorDTO : directorsDTO) {
-            directors.add(DirectorMapper.directorDTOTODirector(directorDTO));
-
-        }
-
-        return directors;
-    }
 }

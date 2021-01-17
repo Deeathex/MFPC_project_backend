@@ -132,6 +132,7 @@ public class TransactionService {
                 LOG.info("Transaction t[" + transaction.getId() + "] aborted");
                 transactions.get(transaction.getId()).setTransactionStatus(TransactionStatus.ABORTED);
             } else {
+                // strong 2PL (each t holds all its locks until the t terminates (R + W))
                 releaseLocksAndCommit(transaction);
             }
         } else {
@@ -144,7 +145,7 @@ public class TransactionService {
         Runnable runnableDeadlock1 = () -> {
             try {
                 LOG.info("Starting thread 1 for t1");
-                System.out.println("Running t1 for thread 1");
+                LOG.info("Running t1 for thread 1");
                 executeTransaction(t1);
             } catch (InterruptedException e) {
                 LOG.error("Error occurred: " + e.getMessage());
@@ -154,7 +155,7 @@ public class TransactionService {
         Runnable runnableDeadlock2 = () -> {
             try {
                 LOG.info("Starting thread 2 for t2");
-                System.out.println("Running t2 for thread 2");
+                LOG.info("Running t2 for thread 2");
                 executeTransaction(t2);
             } catch (InterruptedException e) {
                 LOG.error("Error occurred: " + e.getMessage());
@@ -229,6 +230,7 @@ public class TransactionService {
     }
 
     private static class DeadlockChecker {
+        // it tests WFG for cycles continuously, upon each lock wait, instead of periodically (busy wait, for example)
         // returns true if transaction that called checkForDeadlock should be aborted, false otherwise
         public synchronized boolean checkForDeadlock(Transaction transaction, Queue<WaitForGraph> waitForGraphs) {
             // search for corresponding waitForGraph entry from transactions

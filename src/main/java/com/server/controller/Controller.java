@@ -1,9 +1,6 @@
 package com.server.controller;
 
-import com.server.dto.business.AllModelListsDTO;
-import com.server.dto.business.DirectorsAndUsersDTO;
-import com.server.dto.business.MovieAndDirectorDTO;
-import com.server.dto.business.ReviewAndUserDTO;
+import com.server.dto.business.*;
 import com.server.dto.mapper.*;
 import com.server.model.db1.Director;
 import com.server.model.db1.Movie;
@@ -31,13 +28,6 @@ public class Controller {
 
 
     // 6-8 Cazuri de utilizare
-    @PostMapping("/director/{directorId}/movie")
-    public ResponseEntity<?> addMovieForDirector_t1(@PathVariable String directorId, @RequestBody Movie movie) {
-        LOG.log(Level.INFO, "addMovieForDirector called");
-        businessService.addMovieForDirector(directorId, movie);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @PostMapping("/movie/director")
     public ResponseEntity<?> addMovieAndDirector_t2(@RequestBody MovieAndDirectorDTO movieAndDirectorDTO) {
         LOG.log(Level.INFO, "addMovieAndDirector_t2 called");

@@ -3,6 +3,7 @@ package com.server.model.management;
 import com.server.model.enums.LockType;
 import com.server.model.enums.OperationType;
 import lombok.*;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Getter
@@ -47,7 +48,11 @@ public class Operation<T> {
                 if (!isComplementaryOp) {
                     dbResult.setPreviousObject(repository.getOne(recordID));
                 }
-                repository.deleteById(recordID);
+                try {
+                    repository.deleteById(recordID);
+                } catch (EmptyResultDataAccessException e) {
+                    //
+                }
                 break;
             case SELECT_ONE:
                 dbResult.setObject(repository.getOne(recordID));

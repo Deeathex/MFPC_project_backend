@@ -23,6 +23,6 @@ public class Review {
     @Column
     private int rating;
 
-    @ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
     private User user;
 }

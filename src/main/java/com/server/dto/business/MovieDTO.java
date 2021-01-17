@@ -13,5 +13,5 @@ import java.util.Collection;
 public class MovieDTO {
     private String id;
     private String title;
-    private Collection<DirectorDTO> directors = new ArrayList<>();
+    private DirectorDTO director;
 }
