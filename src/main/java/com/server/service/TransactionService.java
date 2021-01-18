@@ -42,15 +42,15 @@ public class TransactionService {
 
             Lock lock = new Lock(generateId(), operation.getLockType(), operation.getRecordID(), operation.getTable(), transaction);
 
-            boolean wait = true;
-            while (wait && !shouldAbort.get()) {
+            AtomicBoolean wait = new AtomicBoolean(true);
+            while (wait.get() && !shouldAbort.get()) {
                 List<Transaction> transactionsThatAlreadyHaveLock = getTransactionsThatAlreadyHave(lock);
 
                 if (transactionsThatAlreadyHaveLock.isEmpty()) {
                     // then we can acquire the lock, and add ourselves in the waitForGraph
                     // to show that we have the lock on the resource
                     LOG.info("Transaction t[" + transaction.getId() + "] was added in the waitForGraphs");
-                    wait = false;
+                    wait.set(false);
                     WaitForGraph waitForGraph = new WaitForGraph(
                             generateId(),
                             operation.getLockType(),
@@ -69,7 +69,7 @@ public class TransactionService {
                     // to show that we are waiting for the resource
                     LOG.info("Transaction t[" + transaction.getId() + "] will wait for lock " + operation.getLockType() +
                             ",on resource " + operation.getRecordID() + ", on table " + operation.getTable());
-                    wait = true;
+                    wait.set(true);
 
                     for (Transaction tAlreadyHasLock : transactionsThatAlreadyHaveLock) {
                         synchronized (waitForGraphs) {
@@ -82,7 +82,7 @@ public class TransactionService {
                     }
 
                 }
-                if (wait) {
+                if (wait.get()) {
                     LOG.info("Transaction t[" + transaction.getId() + "] is waiting...");
                     Thread.sleep(1000);
                     synchronized (waitForGraphs) {
